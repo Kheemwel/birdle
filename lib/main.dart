@@ -24,8 +24,14 @@ class MainApp extends StatelessWidget {
   }
 }
 
-class GamePage extends StatelessWidget {
-  GamePage({super.key});
+class GamePage extends StatefulWidget {
+  const GamePage({super.key});
+
+  @override
+  State<GamePage> createState() => _GamePageState();
+}
+
+class _GamePageState extends State<GamePage> {
   // This manages game logic, and is out of scope for this lesson.
   final Game _game = Game();
 
@@ -43,18 +49,31 @@ class GamePage extends StatelessWidget {
                 for (final letter in guess) Tile(letter.char, letter.type),
               ],
             ),
-          GuessInput(onSubmitGuess: (guess) {}),
+          GuessInput(
+            onSubmitGuess: (String guess) {
+              setState(() {
+                _game.guess(guess);
+              });
+            },
+          ),
         ],
       ),
     );
   }
 }
 
-class GuessInput extends StatelessWidget {
-  GuessInput({super.key, required this.onSubmitGuess});
+class GuessInput extends StatefulWidget {
+  const GuessInput({super.key, required this.onSubmitGuess});
 
   final void Function(String) onSubmitGuess;
+
+  @override
+  State<GuessInput> createState() => _GuessInputState();
+}
+
+class _GuessInputState extends State<GuessInput> {
   final TextEditingController _textEditingController = TextEditingController();
+
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -90,9 +109,16 @@ class GuessInput extends StatelessWidget {
   }
 
   void _onSubmit() {
-    onSubmitGuess(_textEditingController.text.trim());
+    widget.onSubmitGuess(_textEditingController.text.trim());
     _textEditingController.clear();
     _focusNode.requestFocus();
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    _focusNode.dispose();
+    super.dispose();
   }
 }
 
