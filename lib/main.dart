@@ -51,9 +51,17 @@ class _GamePageState extends State<GamePage> {
             ),
           GuessInput(
             onSubmitGuess: (String guess) {
-              setState(() {
-                _game.guess(guess);
-              });
+              final word = guess.trim().toLowerCase();
+              if (word.length != 5 || !_game.isLegalGuess(word)) {
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    const SnackBar(content: Text('Not a valid 5-letter word')),
+                  );
+                return;
+              }
+              if (_game.didWin || _game.didLose) return;
+              setState(() => _game.guess(word));
             },
           ),
         ],
